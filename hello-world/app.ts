@@ -1,30 +1,38 @@
-import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
+import { APIGatewayProxyEvent, Context, APIGatewayProxyResult } from 'aws-lambda';
+import * as router from 'aws-lambda-router'
 
-/**
- *
- * Event doc: https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html#api-gateway-simple-proxy-for-lambda-input-format
- * @param {Object} event - API Gateway Lambda Proxy Input Format
- *
- * Return doc: https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html
- * @returns {Object} object - API Gateway Lambda Proxy Output Format
- *
- */
 
-export const lambdaHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
-    try {
-        return {
-            statusCode: 200,
-            body: JSON.stringify({
-                message: 'hello world',
-            }),
-        };
-    } catch (err) {
-        console.log(err);
-        return {
-            statusCode: 500,
-            body: JSON.stringify({
-                message: 'some error happened',
-            }),
-        };
-    }
+export const lambdaHandler = (event: APIGatewayProxyEvent, eventContext: Context): Promise<APIGatewayProxyResult> => {
+    debugger
+    return router.handler({
+        proxyIntegration: {
+            routes: [
+                {
+                    // request-path-pattern with a path variable:
+                    path: '/hello',
+                    method: 'GET',
+                    // we can use the path param 'id' in the action call:
+                    action: (request, context) => {
+                        debugger
+                        return {
+                            statusCode: 200,
+                            body: JSON.stringify({})
+                        };
+                    }
+                },
+                {
+                    // request-path-pattern with a path variable in Open API style:
+                    path: '/section/{id}',
+                    method: 'GET',
+                    // we can use the path param 'id' in the action call:
+                    action: (request, context) => {
+                        return {
+                            statusCode: 200,
+                            body: JSON.stringify({})
+                        };
+                    }
+                }
+            ]
+        }
+    })(event as any, eventContext)
 };
